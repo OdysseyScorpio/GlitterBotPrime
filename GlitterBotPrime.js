@@ -18,7 +18,6 @@ process.setMaxListeners(0);
 bot.login(auth.token);
 bot.on('ready', () => {
     var user = bot.users.cache.get('353894762761289728');
-    var botlog = bot.channels.cache.get('805080292632952860');
     console.log(`Logged in as ${bot.user.tag}!`);
     logger.info('Connected');
     logger.info('Logged in as: ');
@@ -27,19 +26,12 @@ bot.on('ready', () => {
         runningState = bot.user.username + " running in debug"
     } else {
         runningState = bot.user.username + " has been restarted"
-        //scripts.savePID(bot.user.username);
     }
     try {
         scripts.sendAnnouncement(user, runningState)
     } catch (error) {
         console.log("Error sending message to user:" + user, error);
     }
-    // try {
-    //     scripts.sendAnnouncement(botlog, runningState)
-    // } catch (error) {
-    //     console.log("Error sending message to botlog:" + botlog, error);
-    // }
-
 
     bot.user.setPresence(
         {
@@ -51,15 +43,14 @@ bot.on('ready', () => {
 
 });
 bot.on('message', msg => {
-    //console.log(msg.channel.id)
     var username = msg.author.username
     var userID = msg.author.id
     var channelID = (msg.channel.id ? msg.channel.id : Message.channel.TextChannel.id)
     var messageReceived = msg.content
     messageScript.message(bot, username, userID, channelID, messageReceived, msg, logger);
 });
-//805088791106682911
 bot.on('messageReactionAdd', async (reaction, user) => {
+    console.log(reaction._emoji.name)
     // When we receive a reaction we check if the reaction is partial or not
     if (reaction.partial) {
         // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -71,17 +62,15 @@ bot.on('messageReactionAdd', async (reaction, user) => {
             return;
         }
     }
-    //console.log(reaction)
-    //console.log(reaction.message.id)
-    //console.log(user.id)
-    //bot.
+
+    console.log(reaction.message.id)
     var listentomessages = require(dir + '/listentomessages.json')
     var searchString = '[? messageID == `"' + reaction.message.id + '"`].roles'
     results = jmespath.search(listentomessages, searchString)
     if (results != [] && results.length == 1) {
         roles = results[0]
-        //console.log(roles)
         for (var r = 0; r <= roles.length - 1; r++) {
+            console.log(roles[r].reaction)
             if (roles[r].reaction == reaction._emoji.name) {
                 giveRole = roles[r].role.toString().replace(/[^0-9]/g,"")
                 const role = guild.roles.cache.get(giveRole);
@@ -91,8 +80,4 @@ bot.on('messageReactionAdd', async (reaction, user) => {
         }
 
     }
-    // Now the message has been cached and is fully available
-    //console.log(`${reaction.message.author}'s message "${reaction.message.content}" gained a reaction!`);
-    // The reaction is now also fully available and the properties will be reflected accurately:
-    //console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
 });
