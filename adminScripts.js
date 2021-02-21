@@ -21,6 +21,43 @@ module.exports = {
             var botName = "gbp"
             const channel = bot.channels.cache.get(channelID);
             switch (cmd.toLowerCase()) {
+                case "blockuser":
+                    var query = message.replace(command + cmd, "").trim()
+                    if (query) {
+                        user = parseInt(query)
+                        var blockedUsers = require(dir + '/blockedUsers.json');
+                        blockedUsers.push(user);
+                        file = dir + '/blockedUsers.json'
+                        fs.writeFile(file, JSON.stringify(blockedUsers), 'utf8', function (err) {
+                            if (err) throw err;
+                        });
+                        msg.reply('User is now blocked from picking a role');
+                    }else{
+                        msg.reply('User ID was not provided, please try again');
+                    }
+                    break
+                case "unblockuser":
+                    var query = message.replace(command + cmd, "").trim()
+                    user = parseInt(query)
+                    var blockedUsers = require(dir + '/blockedUsers.json');
+                    var index = blockedUsers.indexOf(user);
+
+                    if (user) {
+                        if (index > -1) {
+                            blockedUsers.splice(index, 1);
+
+                            file = dir + '/blockedUsers.json'
+                            fs.writeFile(file, JSON.stringify(blockedUsers), 'utf8', function (err) {
+                                if (err) throw err;
+                            });
+                            msg.reply('User is now unblocked from picking a role');
+                        }else{
+                            msg.reply('User was not blocked');
+                        }
+                    }else{
+                        msg.reply('User ID was not provided, please try again');
+                    }
+                    break
                 case "listentomessage":
                     var query = message.replace(command + cmd, "").trim()
 
